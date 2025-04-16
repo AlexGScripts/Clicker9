@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let clicks = 0;
-    let clickPower = 1;
-    let cps = 0;
-    let upgradesPurchased = 0;
+    // Load data from localStorage
+    let clicks = parseInt(localStorage.getItem("clicks")) || 0;
+    let clickPower = parseInt(localStorage.getItem("clickPower")) || 1;
+    let cps = parseInt(localStorage.getItem("cps")) || 0;
+    let upgradesPurchased = parseInt(localStorage.getItem("upgradesPurchased")) || 0;
     let megaBoostActive = false;
 
     // DOM elements
@@ -35,9 +36,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Save data to localStorage
+    function saveData() {
+        localStorage.setItem("clicks", clicks);
+        localStorage.setItem("clickPower", clickPower);
+        localStorage.setItem("cps", cps);
+        localStorage.setItem("upgradesPurchased", upgradesPurchased);
+    }
+
     // Click handler
     document.getElementById("click-button").addEventListener("click", () => {
         clicks += clickPower;
+        saveData();
         updateUI();
     });
 
@@ -48,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
             clickPower += 1;
             upgradeCosts.upgrade1 = Math.floor(upgradeCosts.upgrade1 * 1.5);
             upgradesPurchased++;
+            saveData();
             updateUI();
         }
     });
@@ -58,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
             clickPower += 5;
             upgradeCosts.upgrade2 = Math.floor(upgradeCosts.upgrade2 * 1.6);
             upgradesPurchased++;
+            saveData();
             updateUI();
         }
     });
@@ -68,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
             cps += 1;
             upgradeCosts.upgrade3 = Math.floor(upgradeCosts.upgrade3 * 2);
             upgradesPurchased++;
+            saveData();
             updateUI();
         }
     });
@@ -78,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
             clickPower *= 2;
             upgradeCosts.upgrade4 = Math.floor(upgradeCosts.upgrade4 * 3);
             upgradesPurchased++;
+            saveData();
             updateUI();
         }
     });
@@ -93,10 +107,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 clickPower = originalPower;
                 bonusMessageEl.textContent = "No bonus active.";
                 megaBoostActive = false;
+                saveData();
                 updateUI();
             }, 30000);
             upgradeCosts.upgrade5 = Math.floor(upgradeCosts.upgrade5 * 2);
             upgradesPurchased++;
+            saveData();
             updateUI();
         }
     });
@@ -109,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
             bonusMessageEl.textContent = `🎁 Bonus Chest Opened! You got ${reward} clicks!`;
             upgradeCosts.upgrade6 = Math.floor(upgradeCosts.upgrade6 * 2.5);
             upgradesPurchased++;
+            saveData();
             updateUI();
         }
     });
@@ -116,6 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Auto clicker tick
     setInterval(() => {
         clicks += cps;
+        saveData();
         updateUI();
     }, 1000);
 
