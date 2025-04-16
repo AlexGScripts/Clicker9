@@ -1,127 +1,181 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let clicks = parseInt(localStorage.getItem("clicks")) || 0;
-    let clickPower = parseInt(localStorage.getItem("clickPower")) || 1;
-    let cps = parseInt(localStorage.getItem("cps")) || 0;
-    let upgradesPurchased = parseInt(localStorage.getItem("upgradesPurchased")) || 0;
-    let lootboxCost = parseInt(localStorage.getItem("lootboxCost")) || 750;
+  let clicks = parseInt(localStorage.getItem("clicks")) || 0;
+  let clickPower = parseInt(localStorage.getItem("clickPower")) || 1;
+  let cps = parseInt(localStorage.getItem("cps")) || 0;
+  let upgradesPurchased = parseInt(localStorage.getItem("upgradesPurchased")) || 0;
+  let prestige = parseInt(localStorage.getItem("prestige")) || 0;
 
-    const clickCountEl = document.getElementById("click-count");
-    const clickPowerEl = document.getElementById("click-power");
-    const cpsEl = document.getElementById("cps");
-    const upgradesEl = document.getElementById("upgrades");
-    const lootboxCostEl = document.getElementById("lootbox-cost");
-    const lootboxResultEl = document.getElementById("lootbox-result");
+  const multiplier = 1 + prestige;
 
-    const upgradeCosts = {
-        upgrade1: parseInt(localStorage.getItem("upgrade1Cost")) || 10,
-        upgrade2: parseInt(localStorage.getItem("upgrade2Cost")) || 50,
-        upgrade3: parseInt(localStorage.getItem("upgrade3Cost")) || 150,
-        upgrade4: parseInt(localStorage.getItem("upgrade4Cost")) || 500,
-        upgrade5: parseInt(localStorage.getItem("upgrade5Cost")) || 1200,
-        autoclick1: parseInt(localStorage.getItem("autoclick1Cost")) || 100,
-        autoclick2: parseInt(localStorage.getItem("autoclick2Cost")) || 300,
-        autoclick3: parseInt(localStorage.getItem("autoclick3Cost")) || 1000,
-        autoclick4: parseInt(localStorage.getItem("autoclick4Cost")) || 2500,
-        autoclick5: parseInt(localStorage.getItem("autoclick5Cost")) || 6000,
-    };
+  const upgradeCosts = {
+    upgrade1: parseInt(localStorage.getItem("upgrade1Cost")) || 10,
+    upgrade2: parseInt(localStorage.getItem("upgrade2Cost")) || 50,
+    upgrade3: parseInt(localStorage.getItem("upgrade3Cost")) || 150,
+    upgrade4: parseInt(localStorage.getItem("upgrade4Cost")) || 500,
+    upgrade5: parseInt(localStorage.getItem("upgrade5Cost")) || 1200,
+    autoclick1: parseInt(localStorage.getItem("autoclick1Cost")) || 100,
+    autoclick2: parseInt(localStorage.getItem("autoclick2Cost")) || 300,
+    autoclick3: parseInt(localStorage.getItem("autoclick3Cost")) || 1000,
+    autoclick4: parseInt(localStorage.getItem("autoclick4Cost")) || 2500,
+    autoclick5: parseInt(localStorage.getItem("autoclick5Cost")) || 6000,
+  };
 
-    function updateUI() {
-        clickCountEl.textContent = Math.floor(clicks);
-        clickPowerEl.textContent = clickPower;
-        cpsEl.textContent = cps;
-        upgradesEl.textContent = upgradesPurchased;
+  const boxCosts = {
+    basic: 500,
+    epic: 2000,
+    legendary: 8000,
+  };
 
-        for (let id in upgradeCosts) {
-            const el = document.getElementById(`${id}-cost`);
-            if (el) el.textContent = upgradeCosts[id];
-        }
+  const clickEl = document.getElementById("click-count");
+  const powerEl = document.getElementById("click-power");
+  const cpsEl = document.getElementById("cps");
+  const upgradesEl = document.getElementById("upgrades");
+  const prestigeEl = document.getElementById("prestige");
+  const multiplierEl = document.getElementById("multiplier");
+  const lootboxResult = document.getElementById("lootbox-result");
 
-        lootboxCostEl.textContent = lootboxCost;
+  function updateUI() {
+    clickEl.textContent = Math.floor(clicks);
+    powerEl.textContent = clickPower;
+    cpsEl.textContent = cps;
+    upgradesEl.textContent = upgradesPurchased;
+    prestigeEl.textContent = prestige;
+    multiplierEl.textContent = `${multiplier}x`;
+
+    for (let id in upgradeCosts) {
+      const costEl = document.getElementById(`${id}-cost`);
+      if (costEl) costEl.textContent = upgradeCosts[id];
     }
 
-    function save() {
-        localStorage.setItem("clicks", clicks);
-        localStorage.setItem("clickPower", clickPower);
-        localStorage.setItem("cps", cps);
-        localStorage.setItem("upgradesPurchased", upgradesPurchased);
-        localStorage.setItem("lootboxCost", lootboxCost);
+    document.getElementById("basic-cost").textContent = boxCosts.basic;
+    document.getElementById("epic-cost").textContent = boxCosts.epic;
+    document.getElementById("legendary-cost").textContent = boxCosts.legendary;
+  }
 
-        for (let id in upgradeCosts) {
-            localStorage.setItem(`${id}Cost`, upgradeCosts[id]);
-        }
+  function save() {
+    localStorage.setItem("clicks", clicks);
+    localStorage.setItem("clickPower", clickPower);
+    localStorage.setItem("cps", cps);
+    localStorage.setItem("upgradesPurchased", upgradesPurchased);
+    localStorage.setItem("prestige", prestige);
+    for (let id in upgradeCosts) {
+      localStorage.setItem(`${id}Cost`, upgradeCosts[id]);
     }
+  }
 
-    document.getElementById("click-button").addEventListener("click", () => {
-        clicks += clickPower;
-        save();
-        updateUI();
-    });
-
-    function purchaseUpgrade(id, value, type, multiplier = 1.5) {
-        if (clicks >= upgradeCosts[id]) {
-            clicks -= upgradeCosts[id];
-            if (type === "clickPower") clickPower += value;
-            else if (type === "cps") cps += value;
-            upgradeCosts[id] = Math.floor(upgradeCosts[id] * multiplier);
-            upgradesPurchased++;
-            save();
-            updateUI();
-        }
-    }
-
-    // Click Power Upgrades
-    document.getElementById("upgrade1").addEventListener("click", () => purchaseUpgrade("upgrade1", 1, "clickPower", 1.5));
-    document.getElementById("upgrade2").addEventListener("click", () => purchaseUpgrade("upgrade2", 5, "clickPower", 1.6));
-    document.getElementById("upgrade3").addEventListener("click", () => purchaseUpgrade("upgrade3", 10, "clickPower", 1.7));
-    document.getElementById("upgrade4").addEventListener("click", () => purchaseUpgrade("upgrade4", 25, "clickPower", 1.8));
-    document.getElementById("upgrade5").addEventListener("click", () => purchaseUpgrade("upgrade5", 50, "clickPower", 2));
-
-    // Auto Clicker Upgrades
-    document.getElementById("autoclick1").addEventListener("click", () => purchaseUpgrade("autoclick1", 1, "cps", 1.5));
-    document.getElementById("autoclick2").addEventListener("click", () => purchaseUpgrade("autoclick2", 5, "cps", 1.6));
-    document.getElementById("autoclick3").addEventListener("click", () => purchaseUpgrade("autoclick3", 10, "cps", 1.7));
-    document.getElementById("autoclick4").addEventListener("click", () => purchaseUpgrade("autoclick4", 25, "cps", 1.8));
-    document.getElementById("autoclick5").addEventListener("click", () => purchaseUpgrade("autoclick5", 50, "cps", 2));
-
-    // Loot Box Upgrade
-    document.getElementById("lootbox").addEventListener("click", () => {
-        if (clicks >= lootboxCost) {
-            clicks -= lootboxCost;
-            upgradesPurchased++;
-
-            const rewardType = Math.floor(Math.random() * 3);
-            let rewardMessage = "";
-
-            if (rewardType === 0) {
-                const bonus = Math.floor(Math.random() * 401) + 100;
-                clicks += bonus;
-                rewardMessage = `🎉 You received ${bonus} clicks!`;
-            } else if (rewardType === 1) {
-                const bonus = Math.floor(Math.random() * 5) + 1;
-                clickPower += bonus;
-                rewardMessage = `⚡ You received +${bonus} Click Power!`;
-            } else {
-                const bonus = Math.floor(Math.random() * 5) + 1;
-                cps += bonus;
-                rewardMessage = `🤖 You received +${bonus} CPS!`;
-            }
-
-            lootboxCost = Math.floor(lootboxCost * 1.5);
-            lootboxResultEl.textContent = rewardMessage;
-
-            save();
-            updateUI();
-        } else {
-            lootboxResultEl.textContent = "Not enough clicks to open!";
-        }
-    });
-
-    // Auto-clicking effect
-    setInterval(() => {
-        clicks += cps;
-        save();
-        updateUI();
-    }, 1000);
-
+  document.getElementById("click-button").addEventListener("click", () => {
+    clicks += clickPower * multiplier;
+    save();
     updateUI();
+  });
+
+  function buyUpgrade(id, amount, type, factor = 1.5) {
+    if (clicks >= upgradeCosts[id]) {
+      clicks -= upgradeCosts[id];
+      if (type === "clickPower") clickPower += amount;
+      else cps += amount;
+      upgradesPurchased++;
+      upgradeCosts[id] = Math.floor(upgradeCosts[id] * factor);
+      save();
+      updateUI();
+    }
+  }
+
+  // Upgrade Event Listeners
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById(`upgrade${i}`).addEventListener("click", () =>
+      buyUpgrade(`upgrade${i}`, [1, 5, 10, 25, 50][i - 1], "clickPower", 1.4 + i * 0.1)
+    );
+    document.getElementById(`autoclick${i}`).addEventListener("click", () =>
+      buyUpgrade(`autoclick${i}`, [1, 5, 10, 25, 50][i - 1], "cps", 1.4 + i * 0.1)
+    );
+  }
+
+  function openBox(type) {
+    const cost = boxCosts[type];
+    if (clicks < cost) {
+      lootboxResult.textContent = "Not enough clicks!";
+      return;
+    }
+
+    clicks -= cost;
+    let reward = 0;
+    let msg = "";
+
+    if (type === "basic") {
+      reward = Math.floor(Math.random() * 300) + 100;
+      clicks += reward;
+      msg = `You got ${reward} clicks from a Basic Box!`;
+    } else if (type === "epic") {
+      const rand = Math.random();
+      if (rand < 0.5) {
+        reward = Math.floor(Math.random() * 500) + 250;
+        clicks += reward;
+        msg = `Epic reward: +${reward} clicks!`;
+      } else {
+        const boost = Math.floor(Math.random() * 4) + 1;
+        clickPower += boost;
+        msg = `Epic reward: +${boost} click power!`;
+      }
+    } else {
+      const rand = Math.random();
+      if (rand < 0.33) {
+        const big = Math.floor(Math.random() * 1000) + 1000;
+        clicks += big;
+        msg = `LEGENDARY: +${big} clicks! 🔥`;
+      } else if (rand < 0.66) {
+        const boost = Math.floor(Math.random() * 6) + 2;
+        clickPower += boost;
+        msg = `LEGENDARY: +${boost} click power! 💥`;
+      } else {
+        const auto = Math.floor(Math.random() * 6) + 2;
+        cps += auto;
+        msg = `LEGENDARY: +${auto} CPS! 🚀`;
+      }
+    }
+
+    lootboxResult.textContent = msg;
+    save();
+    updateUI();
+  }
+
+  document.getElementById("basic-box").addEventListener("click", () => openBox("basic"));
+  document.getElementById("epic-box").addEventListener("click", () => openBox("epic"));
+  document.getElementById("legendary-box").addEventListener("click", () => openBox("legendary"));
+
+  document.getElementById("prestige-button").addEventListener("click", () => {
+    if (clicks >= 100000) {
+      prestige++;
+      clicks = 0;
+      clickPower = 1;
+      cps = 0;
+      upgradesPurchased = 0;
+      for (let id in upgradeCosts) {
+        upgradeCosts[id] = {
+          upgrade1: 10,
+          upgrade2: 50,
+          upgrade3: 150,
+          upgrade4: 500,
+          upgrade5: 1200,
+          autoclick1: 100,
+          autoclick2: 300,
+          autoclick3: 1000,
+          autoclick4: 2500,
+          autoclick5: 6000,
+        }[id];
+      }
+      save();
+      location.reload(); // reload game
+    } else {
+      alert("You need 100,000 clicks to Prestige!");
+    }
+  });
+
+  setInterval(() => {
+    clicks += cps * multiplier;
+    save();
+    updateUI();
+  }, 1000);
+
+  updateUI();
 });
