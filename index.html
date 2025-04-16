@@ -3,44 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ultimate Clicker Game</title>
+  <title>Prestige Clicker Game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>🔥 Ultimate Clicker Game 🔥</h1>
+  <h1>🔥 Prestige Clicker Game 🔥</h1>
   <p>Clicks: <span id="click-count">0</span></p>
   <p>Click Power: <span id="click-power">1</span></p>
-  <p>Auto Clicks per Second (CPS): <span id="cps">0</span></p>
+  <p>CPS: <span id="cps">0</span></p>
+  <p>Prestige Level: <span id="prestige">0</span></p>
+  <p>Multiplier: <span id="multiplier">1x</span></p>
   <p>Upgrades Purchased: <span id="upgrades">0</span></p>
 
   <button id="click-button">Click Me!</button>
 
-  <h2>Click Power Upgrades</h2>
-  <ul>
-    <li><button id="upgrade1">+1 Power</button> - Cost: <span id="upgrade1-cost">10</span></li>
-    <li><button id="upgrade2">+5 Power</button> - Cost: <span id="upgrade2-cost">50</span></li>
-    <li><button id="upgrade3">+10 Power</button> - Cost: <span id="upgrade3-cost">150</span></li>
-    <li><button id="upgrade4">+25 Power</button> - Cost: <span id="upgrade4-cost">500</span></li>
-    <li><button id="upgrade5">+50 Power</button> - Cost: <span id="upgrade5-cost">1200</span></li>
-  </ul>
+  <h2>Upgrades</h2>
+  <div class="upgrades">
+    <!-- Click Power Upgrades -->
+    <div>
+      <h3>Click Power</h3>
+      <ul>
+        <li><button id="upgrade1">+1</button> - Cost: <span id="upgrade1-cost">10</span></li>
+        <li><button id="upgrade2">+5</button> - Cost: <span id="upgrade2-cost">50</span></li>
+        <li><button id="upgrade3">+10</button> - Cost: <span id="upgrade3-cost">150</span></li>
+        <li><button id="upgrade4">+25</button> - Cost: <span id="upgrade4-cost">500</span></li>
+        <li><button id="upgrade5">+50</button> - Cost: <span id="upgrade5-cost">1200</span></li>
+      </ul>
+    </div>
 
-  <h2>Auto Clicker Upgrades</h2>
-  <ul>
-    <li><button id="autoclick1">+1 CPS</button> - Cost: <span id="autoclick1-cost">100</span></li>
-    <li><button id="autoclick2">+5 CPS</button> - Cost: <span id="autoclick2-cost">300</span></li>
-    <li><button id="autoclick3">+10 CPS</button> - Cost: <span id="autoclick3-cost">1000</span></li>
-    <li><button id="autoclick4">+25 CPS</button> - Cost: <span id="autoclick4-cost">2500</span></li>
-    <li><button id="autoclick5">+50 CPS</button> - Cost: <span id="autoclick5-cost">6000</span></li>
-  </ul>
+    <!-- Auto Clicker Upgrades -->
+    <div>
+      <h3>Auto Clicker</h3>
+      <ul>
+        <li><button id="autoclick1">+1 CPS</button> - Cost: <span id="autoclick1-cost">100</span></li>
+        <li><button id="autoclick2">+5 CPS</button> - Cost: <span id="autoclick2-cost">300</span></li>
+        <li><button id="autoclick3">+10 CPS</button> - Cost: <span id="autoclick3-cost">1000</span></li>
+        <li><button id="autoclick4">+25 CPS</button> - Cost: <span id="autoclick4-cost">2500</span></li>
+        <li><button id="autoclick5">+50 CPS</button> - Cost: <span id="autoclick5-cost">6000</span></li>
+      </ul>
+    </div>
+  </div>
 
   <h2>🎁 Loot Boxes</h2>
   <ul>
-    <li>
-      <button id="lootbox">Open Loot Box</button> 
-      - Cost: <span id="lootbox-cost">750</span>
-    </li>
-    <li id="lootbox-result">You haven't opened a box yet.</li>
+    <li><button id="basic-box">Open Basic Box</button> - Cost: <span id="basic-cost">500</span></li>
+    <li><button id="epic-box">Open Epic Box</button> - Cost: <span id="epic-cost">2000</span></li>
+    <li><button id="legendary-box">Open Legendary Box</button> - Cost: <span id="legendary-cost">8000</span></li>
+    <li id="lootbox-result">No loot yet...</li>
   </ul>
+
+  <h2>🌟 Prestige</h2>
+  <button id="prestige-button">Prestige (Needs 100,000 Clicks)</button>
 
   <script src="script.js"></script>
 </body>
