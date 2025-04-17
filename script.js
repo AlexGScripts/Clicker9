@@ -1,9 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   let clicks = parseInt(localStorage.getItem("clicks")) || 0;
+  let totalClicks = parseInt(localStorage.getItem("totalClicks")) || 0;
   let clickPower = parseInt(localStorage.getItem("clickPower")) || 1;
   let cps = parseInt(localStorage.getItem("cps")) || 0;
   let upgradesPurchased = parseInt(localStorage.getItem("upgradesPurchased")) || 0;
   let prestige = parseInt(localStorage.getItem("prestige")) || 0;
+
+  const achievements = JSON.parse(localStorage.getItem("achievements")) || {
+    "100clicks": false,
+    "1000clicks": false,
+    "10ktotal": false
+  };
 
   const multiplier = 1 + prestige;
 
@@ -34,6 +41,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const multiplierEl = document.getElementById("multiplier");
   const lootboxResult = document.getElementById("lootbox-result");
 
+  const achvEls = {
+    "100clicks": document.getElementById("achv-100-clicks"),
+    "1000clicks": document.getElementById("achv-1000-clicks"),
+    "10ktotal": document.getElementById("achv-10k-total"),
+  };
+
   function updateUI() {
     clickEl.textContent = Math.floor(clicks);
     powerEl.textContent = clickPower;
@@ -50,21 +63,57 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("basic-cost").textContent = boxCosts.basic;
     document.getElementById("epic-cost").textContent = boxCosts.epic;
     document.getElementById("legendary-cost").textContent = boxCosts.legendary;
+
+    // Update achievements
+    for (let key in achievements) {
+      if (achievements[key] && achvEls[key]) {
+        achvEls[key].textContent = "✅ " + achvEls[key].textContent.split(" - ")[0] + " - UNLOCKED!";
+      }
+    }
   }
 
   function save() {
     localStorage.setItem("clicks", clicks);
+    localStorage.setItem("totalClicks", totalClicks);
     localStorage.setItem("clickPower", clickPower);
     localStorage.setItem("cps", cps);
     localStorage.setItem("upgradesPurchased", upgradesPurchased);
     localStorage.setItem("prestige", prestige);
+    localStorage.setItem("achievements", JSON.stringify(achievements));
     for (let id in upgradeCosts) {
       localStorage.setItem(`${id}Cost`, upgradeCosts[id]);
     }
   }
 
+  function checkAchievements() {
+    if (!achievements["100clicks"] && clicks >= 100) {
+      achievements["100clicks"] = true;
+      clickPower += 5;
+      alert("Achievement unlocked: 100 Clicks! +5 Click Power");
+    }
+
+    if (!achievements["1000clicks"] && clicks >= 1000) {
+      achievements["1000clicks"] = true;
+      clickPower += 10;
+      alert("Achievement unlocked: 1,000 Clicks! +10 Click Power");
+    }
+
+    if (!achievements["10ktotal"] && totalClicks >= 10000) {
+      achievements["10ktotal"] = true;
+      // simulate free epic box
+      clicks += 1000;
+      alert("Achievement unlocked: 10,000 Total Clicks! +1 Epic Box (1,000 Clicks)");
+    }
+
+    save();
+    updateUI();
+  }
+
   document.getElementById("click-button").addEventListener("click", () => {
-    clicks += clickPower * multiplier;
+    const gained = clickPower * multiplier;
+    clicks += gained;
+    totalClicks += gained;
+    checkAchievements();
     save();
     updateUI();
   });
@@ -81,7 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Upgrade Event Listeners
   for (let i = 1; i <= 5; i++) {
     document.getElementById(`upgrade${i}`).addEventListener("click", () =>
       buyUpgrade(`upgrade${i}`, [1, 5, 10, 25, 50][i - 1], "clickPower", 1.4 + i * 0.1)
@@ -147,6 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (clicks >= 100000) {
       prestige++;
       clicks = 0;
+      totalClicks = 0;
       clickPower = 1;
       cps = 0;
       upgradesPurchased = 0;
@@ -165,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }[id];
       }
       save();
-      location.reload(); // reload game
+      location.reload();
     } else {
       alert("You need 100,000 clicks to Prestige!");
     }
@@ -173,6 +222,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setInterval(() => {
     clicks += cps * multiplier;
+    totalClicks += cps * multiplier;
+    checkAchievements();
     save();
     updateUI();
   }, 1000);
