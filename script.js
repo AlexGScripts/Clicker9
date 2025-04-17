@@ -1,16 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   let clicks = parseInt(localStorage.getItem("clicks")) || 0;
-  let totalClicks = parseInt(localStorage.getItem("totalClicks")) || 0;
   let clickPower = parseInt(localStorage.getItem("clickPower")) || 1;
   let cps = parseInt(localStorage.getItem("cps")) || 0;
   let upgradesPurchased = parseInt(localStorage.getItem("upgradesPurchased")) || 0;
   let prestige = parseInt(localStorage.getItem("prestige")) || 0;
-
-  const achievements = JSON.parse(localStorage.getItem("achievements")) || {
-    "100clicks": false,
-    "1000clicks": false,
-    "10ktotal": false
-  };
+  let lastOfflineTime = parseInt(localStorage.getItem("lastOfflineTime")) || Date.now();
+  let offlineEarnings = 0;
+  const boosterDuration = 10 * 60 * 1000; // 10 minutes of boost
 
   const multiplier = 1 + prestige;
 
@@ -41,12 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const multiplierEl = document.getElementById("multiplier");
   const lootboxResult = document.getElementById("lootbox-result");
 
-  const achvEls = {
-    "100clicks": document.getElementById("achv-100-clicks"),
-    "1000clicks": document.getElementById("achv-1000-clicks"),
-    "10ktotal": document.getElementById("achv-10k-total"),
-  };
-
   function updateUI() {
     clickEl.textContent = Math.floor(clicks);
     powerEl.textContent = clickPower;
@@ -63,60 +53,29 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("basic-cost").textContent = boxCosts.basic;
     document.getElementById("epic-cost").textContent = boxCosts.epic;
     document.getElementById("legendary-cost").textContent = boxCosts.legendary;
-
-    // Update achievements
-    for (let key in achievements) {
-      if (achievements[key] && achvEls[key]) {
-        achvEls[key].textContent = "✅ " + achvEls[key].textContent.split(" - ")[0] + " - UNLOCKED!";
-      }
-    }
   }
 
   function save() {
     localStorage.setItem("clicks", clicks);
-    localStorage.setItem("totalClicks", totalClicks);
     localStorage.setItem("clickPower", clickPower);
     localStorage.setItem("cps", cps);
     localStorage.setItem("upgradesPurchased", upgradesPurchased);
     localStorage.setItem("prestige", prestige);
-    localStorage.setItem("achievements", JSON.stringify(achievements));
     for (let id in upgradeCosts) {
       localStorage.setItem(`${id}Cost`, upgradeCosts[id]);
     }
+    localStorage.setItem("lastOfflineTime", Date.now());
   }
 
-  function checkAchievements() {
-    if (!achievements["100clicks"] && clicks >= 100) {
-      achievements["100clicks"] = true;
-      clickPower += 5;
-      alert("Achievement unlocked: 100 Clicks! +5 Click Power");
+  function offlineProgress() {
+    let timeOffline = Date.now() - lastOfflineTime;
+    if (timeOffline > 0) {
+      offlineEarnings = Math.floor((timeOffline / 1000) * cps * multiplier);
+      clicks += offlineEarnings;
+      save();
+      alert(`You earned ${offlineEarnings} clicks while you were offline!`);
     }
-
-    if (!achievements["1000clicks"] && clicks >= 1000) {
-      achievements["1000clicks"] = true;
-      clickPower += 10;
-      alert("Achievement unlocked: 1,000 Clicks! +10 Click Power");
-    }
-
-    if (!achievements["10ktotal"] && totalClicks >= 10000) {
-      achievements["10ktotal"] = true;
-      // simulate free epic box
-      clicks += 1000;
-      alert("Achievement unlocked: 10,000 Total Clicks! +1 Epic Box (1,000 Clicks)");
-    }
-
-    save();
-    updateUI();
   }
-
-  document.getElementById("click-button").addEventListener("click", () => {
-    const gained = clickPower * multiplier;
-    clicks += gained;
-    totalClicks += gained;
-    checkAchievements();
-    save();
-    updateUI();
-  });
 
   function buyUpgrade(id, amount, type, factor = 1.5) {
     if (clicks >= upgradeCosts[id]) {
@@ -128,15 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
       save();
       updateUI();
     }
-  }
-
-  for (let i = 1; i <= 5; i++) {
-    document.getElementById(`upgrade${i}`).addEventListener("click", () =>
-      buyUpgrade(`upgrade${i}`, [1, 5, 10, 25, 50][i - 1], "clickPower", 1.4 + i * 0.1)
-    );
-    document.getElementById(`autoclick${i}`).addEventListener("click", () =>
-      buyUpgrade(`autoclick${i}`, [1, 5, 10, 25, 50][i - 1], "cps", 1.4 + i * 0.1)
-    );
   }
 
   function openBox(type) {
@@ -187,15 +137,10 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUI();
   }
 
-  document.getElementById("basic-box").addEventListener("click", () => openBox("basic"));
-  document.getElementById("epic-box").addEventListener("click", () => openBox("epic"));
-  document.getElementById("legendary-box").addEventListener("click", () => openBox("legendary"));
-
-  document.getElementById("prestige-button").addEventListener("click", () => {
+  function prestigeGame() {
     if (clicks >= 100000) {
       prestige++;
       clicks = 0;
-      totalClicks = 0;
       clickPower = 1;
       cps = 0;
       upgradesPurchased = 0;
@@ -214,19 +159,48 @@ document.addEventListener("DOMContentLoaded", () => {
         }[id];
       }
       save();
-      location.reload();
+      location.reload(); // reload game
     } else {
       alert("You need 100,000 clicks to Prestige!");
     }
+  }
+
+  // Update UI for the first time
+  updateUI();
+
+  // Offline progress
+  offlineProgress();
+
+  // Event listeners for upgrades and buttons
+  document.getElementById("click-button").addEventListener("click", () => {
+    clicks += clickPower * multiplier;
+    save();
+    updateUI();
   });
 
+  // Upgrade Event Listeners
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById(`upgrade${i}`).addEventListener("click", () =>
+      buyUpgrade(`upgrade${i}`, [1, 5, 10, 25, 50][i - 1], "clickPower", 1.4 + i * 0.1)
+    );
+    document.getElementById(`autoclick${i}`).addEventListener("click", () =>
+      buyUpgrade(`autoclick${i}`, [1, 5, 10, 25, 50][i - 1], "cps", 1.4 + i * 0.1)
+    );
+  }
+
+  // Lootbox Event Listeners
+  document.getElementById("basic-box").addEventListener("click", () => openBox("basic"));
+  document.getElementById("epic-box").addEventListener("click", () => openBox("epic"));
+  document.getElementById("legendary-box").addEventListener("click", () => openBox("legendary"));
+
+  // Prestige Button Event Listener
+  document.getElementById("prestige-button").addEventListener("click", prestigeGame);
+
+  // Offline earnings update interval
   setInterval(() => {
     clicks += cps * multiplier;
-    totalClicks += cps * multiplier;
-    checkAchievements();
     save();
     updateUI();
   }, 1000);
-
-  updateUI();
 });
+
