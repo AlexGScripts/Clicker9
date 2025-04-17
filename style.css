@@ -1,10 +1,11 @@
-/* Reset and base */
+/* Base reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Body styles */
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
@@ -53,34 +54,70 @@ button:hover {
   background: linear-gradient(145deg, #00c6ff, #0072ff);
 }
 
-/* Upgrade & Loot box sections */
-.upgrades {
+/* Game container */
+#game-container {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 40px;
-  margin-top: 20px;
+  flex-direction: column;
+  align-items: center;
 }
 
-.upgrades div {
+/* Stats section */
+#stats {
+  margin-bottom: 20px;
+}
+
+/* Upgrade & Loot box sections */
+#upgrade-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 30px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+#click-power-upgrades, #autoclicker-upgrades {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 45%;
+}
+
+#click-power-upgrades h3, #autoclicker-upgrades h3 {
+  color: #ffde59;
+  margin-bottom: 15px;
+  font-size: 1.6rem;
+}
+
+#click-power-upgrades div, #autoclicker-upgrades div {
   background: rgba(255, 255, 255, 0.1);
   padding: 15px;
   border-radius: 15px;
-  width: 250px;
+  width: 100%;
   backdrop-filter: blur(4px);
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+#upgrade-section div p {
+  font-size: 1rem;
+  margin-bottom: 10px;
 }
 
-li {
-  margin: 10px 0;
+/* Lootbox section */
+#lootbox-section {
+  margin-top: 30px;
 }
 
-/* Lootbox result text */
+button#basic-box,
+button#epic-box,
+button#legendary-box {
+  margin: 5px;
+  padding: 12px 25px;
+  background: linear-gradient(145deg, #ffec61, #ffdc28);
+  border-radius: 12px;
+  font-weight: bold;
+}
+
 #lootbox-result {
   margin-top: 10px;
   font-size: 1.1rem;
@@ -98,10 +135,21 @@ li {
   background: linear-gradient(145deg, #ff6a00, #ee0979);
 }
 
-/* Responsive layout */
+/* Responsive layout for smaller screens */
 @media (max-width: 768px) {
-  .upgrades {
+  #upgrade-section {
     flex-direction: column;
     align-items: center;
+  }
+
+  #click-power-upgrades, #autoclicker-upgrades {
+    width: 100%;
+  }
+
+  button#basic-box,
+  button#epic-box,
+  button#legendary-box {
+    width: 100%;
+    padding: 12px 15px;
   }
 }
