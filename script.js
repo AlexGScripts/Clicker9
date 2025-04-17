@@ -6,8 +6,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let prestige = parseInt(localStorage.getItem("prestige")) || 0;
   let lastOfflineTime = parseInt(localStorage.getItem("lastOfflineTime")) || Date.now();
   let offlineEarnings = 0;
-  const boosterDuration = 10 * 60 * 1000; // 10 minutes of boost
-
   const multiplier = 1 + prestige;
 
   const upgradeCosts = {
@@ -203,4 +201,3 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUI();
   }, 1000);
 });
-
